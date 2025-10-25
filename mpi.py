@@ -48,7 +48,7 @@ for exp in range (20):                  #vamos preparar a exponenciacao
         comm.Send(received, dest=0)         #vamos retornar ele ao p0
         print("Processo 1 devolveu os dados!")
 
-if rank == 0:
+if rank == 0:                               #vamos criar aqui um arquivo de saida no formato csv para melhor visualização.
     with open("Resultados.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(["n (doubles)", "tempo (s)", "taxa (MB/s)"])
