@@ -32,6 +32,7 @@ for exp in range (20):                  #vamos preparar a exponenciacao
         taxa = mb / tempo
 
         resultados.append({                 #vamos criar o discionario para depois poder exportar
+            "operação": "Send/Recv",
             "n (doubles)": n,
             "tempo (s)": f"{tempo:.6e}",    #vamos deixar formato na saida também
             "taxa (MB/s)": f"{taxa:.2f}"
@@ -51,8 +52,8 @@ for exp in range (20):                  #vamos preparar a exponenciacao
 if rank == 0:                               #vamos criar aqui um arquivo de saida no formato csv para melhor visualização.
     with open("Resultados.csv", "w", newline="") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["n (doubles)", "tempo (s)", "taxa (MB/s)"])
+        writer.writerow(["operação", "n (doubles)", "tempo (s)", "taxa (MB/s)"])
         for r in resultados:
-            writer.writerow([r["n (doubles)"], r["tempo (s)"], r["taxa (MB/s)"]])
+            writer.writerow([r["operação"], r["n (doubles)"], r["tempo (s)"], r["taxa (MB/s)"]])
 
     print("\n Resutlados Salvos em 'Resultados.csv do repositório desse programa!'")
