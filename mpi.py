@@ -21,8 +21,9 @@ for exp in range (20):                  #vamos preparar a exponenciacao
         tempo = fim - inicio
         
         bytes_total = 2 * n * 8             #aqui estamos calculando qual o tamanho a mensagem terá a depender do tanto de doubles que vamos enviar, isso já contando com a ida e volta
-        mb = bytes_total
+        mb = bytes_total / (1024**2)
         taxa = mb / tempo
+
 
         print(f"{n:10d} doubles | tempo: {tempo:.6e}s | taxa {taxa:.2f} MB/s")
 
