@@ -4,7 +4,7 @@ import csv
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
-size = comm.Get_size()
+size = comm.Get_size()                      #quero garantir que haja apenas um ping-pong e não volei, ou seja, apenas 2 jogam
 resultados = []                             #vamos criar uma tupla para armezenar os dados do relatório
 
 if size != 2:
@@ -12,15 +12,15 @@ if size != 2:
         print("Este programa requer exatamente 2 processos (-np 2)!")
     exit()
 
-for exp in range (20):                  #vamos preparar a exponenciacao
-    n = 2**exp                          #vamos deixar o valor de n dinamicamente com um laço de repetição
+for exp in range (20):                      #vamos preparar a exponenciacao
+    n = 2**exp                              #vamos deixar o valor de n dinamicamente com um laço de repetição
     
     if rank == 0:
         data = np.random.random(n)          #vamos criar um array de n doubles aleatórios com o numpy por que é mais rápido
         comm.Barrier()                      #precisei aprender a usar isso aqui para poder medir corretamente o tempo, já que as vezes o P1 fica preso fazendo algo mais lento
         inicio = MPI.Wtime()
         comm.Send(data, dest=1)             #enviando para o processo 1
-        print("Processo 0 enviou os dados!")
+        print("Processo 0 enviou os dados!")#apenas ilustrativo, as saidas no terminal ficam fora de ordem, mas no csv vai sair na ordem
         comm.Recv(data, source=1)           #recebendo os dados de volta do processo 1
         print("processo 0 Recebeu os dados!")
         fim = MPI.Wtime()                   #criamos o cue do inicio e o cue do fim, depois é só fazer uma subtração e teremos o tempo gasto nesse trecho
