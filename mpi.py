@@ -5,7 +5,10 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-
+if size != 2:
+    if rank == 0:
+        print("Este programa requer exatamente 2 processos (-np 2)!")
+    exit()
 
 for exp in range (20):                  #vamos preparar a exponenciacao
     n = 2**exp                          #vamos deixar o valor de n dinamicamente com um laço de repetição
@@ -15,22 +18,23 @@ for exp in range (20):                  #vamos preparar a exponenciacao
         comm.Barrier()                      #precisei aprender a usar isso aqui para poder medir corretamente o tempo, já que as vezes o P1 fica preso fazendo algo mais lento
         inicio = MPI.Wtime()
         comm.Send(data, dest=1)             #enviando para o processo 1
+        print("Processo 0 enviou os dados!")
         comm.Recv(data, source=1)           #recebendo os dados de volta do processo 1
         fim = MPI.Wtime()                   #criamos o cue do inicio e o cue do fim, depois é só fazer uma subtração e teremos o tempo gasto nesse trecho
 
         tempo = fim - inicio
         
         bytes_total = 2 * n * 8             #aqui estamos calculando qual o tamanho a mensagem terá a depender do tanto de doubles que vamos enviar, isso já contando com a ida e volta
-        mb = bytes_total / (1024**2)
+        mb = bytes_total / (1024**2)        #calculo básico do tamanho em megabytes
         taxa = mb / tempo
-
 
         print(f"{n:10d} doubles | tempo: {tempo:.6e}s | taxa {taxa:.2f} MB/s")
 
     elif rank == 1:                         #aqui é o que o P1 vai rodar
         received = np.empty(n, dtype='d')   #vamos criar um espaço vazio para guardados os dados recebidos, recv precisa guardar o dado na memória, diferente do send que le direto do array
+        comm.barrier()
         comm.Recv(received, source=0)       #agora vamos receber os dados
         comm.Send(received, dest=0)         #vamos retornar ele ao p0
-        print("processo 1 devolveu os dados!")
+        print("Processo 1 devolveu os dados!")
 
 
