@@ -4,23 +4,32 @@ import numpy as np
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-n = 10                                  #nosso array vai começar com 10
 
-if rank == 0:
-    data = np.random.random(n)          #vamos criar um array de n doubles aleatórios
 
-    inicio = MPI.Wtime()
-    comm.Send(data, dest=1)             #enviando para o processo 1
-    comm.Recv(data, source=1)           #recebendo os dados de volta do processo 1
-    fim = MPI.Wtime()
 
-    tempo = fim - inicio
-    print(f"[P0] tamanho {n} doubles | tempo total: {tempo:.6f} s")
+for exp in range (20):                  #vamos preparar a exponenciacao
+    n = 2**exp                          #vamos deixar o valor de n dinamicamente com um laço de repetição
+    
+    if rank == 0:
+        data = np.random.random(n)          #vamos criar um array de n doubles aleatórios com o numpy por que é mais rápido
+        comm.Barrier()                      #precisei aprender a usar isso aqui para poder medir corretamente o tempo, já que as vezes o P1 fica preso fazendo algo mais lento
+        inicio = MPI.Wtime()
+        comm.Send(data, dest=1)             #enviando para o processo 1
+        comm.Recv(data, source=1)           #recebendo os dados de volta do processo 1
+        fim = MPI.Wtime()                   #criamos o cue do inicio e o cue do fim, depois é só fazer uma subtração e teremos o tempo gasto nesse trecho
 
-elif rank == 1:
-    message = np.empty(n, dtype='d')   #vamos criar um espaço vazio para guardados os dados recebidos
-    comm.Recv(message, source=0)         #agora vamos receber os dados
-    comm.Send(message, dest=0)           #vamos retornar ele ao p0
-    print("processo 1 devolveu os dados!")
+        tempo = fim - inicio
+        
+        bytes_total = 2 * n * 8             #aqui estamos calculando qual o tamanho a mensagem terá a depender do tanto de doubles que vamos enviar, isso já contando com a ida e volta
+        mb = bytes_total
+        taxa = mb / tempo
+
+        print(f"{n:10d} doubles | tempo: {tempo:.6e}s | taxa {taxa:.2f} MB/s")
+
+    elif rank == 1:                         #aqui é o que o P1 vai rodar
+        received = np.empty(n, dtype='d')   #vamos criar um espaço vazio para guardados os dados recebidos, recv precisa guardar o dado na memória, diferente do send que le direto do array
+        comm.Recv(received, source=0)       #agora vamos receber os dados
+        comm.Send(received, dest=0)         #vamos retornar ele ao p0
+        print("processo 1 devolveu os dados!")
 
 
