@@ -3,7 +3,7 @@
     Este projeto implementa uma simulação de comunicação ponto a ponto (Point-to-Point) utilizando MPI (Message Passing Interface) com a biblioteca mpi4py.
     O objetivo é medir o tempo de transmissão e recepção de mensagens entre dois processos (Processo 0 e Processo 1) — o clássico experimento Ping-Pong — e calcular a taxa de transferência (MB/s) para diferentes tamanhos de mensagem.
     O código também exporta os resultados em formato CSV, permitindo análise posterior em planilhas ou ferramentas de visualização.
- 
+  
   ⚙️ Tecnologias Utilizadas
     Python 3.x
     mpi4py — Interface Python para MPI
